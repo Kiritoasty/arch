@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arch Linux Install Guide</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0f0f0f;
+            color: #ffffff;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            height: 60px;
+            background-color: #1a1a1a;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .topbar .main-button {
+            position: absolute;
+            left: 20px;
+            background-color: #0f0f0f;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .topbar .main-button:hover {
+            background-color: #333;
+        }
+
+        .topbar .title {
+            font-size: 1.25em;
+            font-weight: bold;
+        }
+
+        .content {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 15px 20px;
+            background-color: #1a1a1a;
+            border-radius: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            line-height: 1.6;
+        }
+
+        pre {
+            background-color: #0f0f0f;
+            padding: 12px 14px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin-bottom: 1em;
+        }
+
+        h3, h4 {
+            margin-top: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <a href="https://kiritoasty.github.io/docs/main.html" class="main-button">Main page</a>
+        <div class="title">Arch Linux Install Guide</div>
+    </div>
+
+    <div class="content">
+        <h3>Kiritoasty's Arch Install guide</h3>
+        <p>
+            This is my arch install guide template that is basically like supposed to walk you through the stuff about installing arch (You probably shouldn't use this guide or the arch install guide if you're a noob !! don't do that thats gonna delete your mental health with EVIL mental health
+        </p>
+
+        <h4>Step 1, Booting the ISO</h4>
+        <p>
+           Boot into the arch iso, I'm assuming that because you use this template, you probably know where to go to get that
+        </p>
+
+        <h4>Step 2, Confirm UEFI mode</h4>
+        <p>
+            Run this command to figure out if you are on uefi (this is a uefi tutorial !!)
+        </p>
+        <pre>ls /sys/firmware/efi/efivars</pre>
+
+        <h4>Step 3, Sync package databases</h4>
+        <p>
+            Update the package databases early to avoid EVIL package management errors when you get to installing things like network manager
+        </p>
+        <pre>pacman -Syy</pre>
+
+        <h4>Step 4, Internet connection</h4>
+        <p>
+            Test your connection with a ping, ethernet usually works automatically !!
+        </p>
+        <pre>ping -c 3 archlinux.org</pre>
+        <p>
+            If you're using wifi you might wanna use iwctl to connect (Pro tip guys it made me able to install packages without opening up repos with a thing I don't have, called the web browser or web requests)
+        </p>
+        <pre>
+iwctl
+device list
+station wlan0 scan
+station wlan0 get-networks
+station wlan0 connect your_silly_wifi_name
+exit
+        </pre>
+
+        <h4>Step 5, Partitioning the disk</h4>
+        <p>
+            Open cfdisk and select GPT when prompted
+            Create a 512 Mega Bite (MB/Megabyte) EFI partition and one root partition using the remaining space
+            Write the changes and then go to the quit button when you are done
+        </p>
+        <pre>cfdisk</pre>
+
+        <h4>Step 6, Formatting</h4>
+        <p>
+            Format the partitions and replace the silly device names if yours are different
+        </p>
+        <pre>
+mkfs.fat -F32 /dev/sda1
+mkfs.ext4 /dev/sda2
+        </pre>
+
+        <h4>Step 7, Mounting partitions</h4>
+        <p>
+            Mount the root partition first, then mount the EFI partition like you would do with any normal uefi installation
+        </p>
+        <pre>
+mount /dev/sda2 /mnt
+mkdir -p /mnt/boot
+mount /dev/sda1 /mnt/boot
+        </pre>
+
+        <h4>Step 8, Installing the base system so I can boot up my hardware without crying on my laptop keys and then they break from my ocean</h4>
+        <p>
+            Install the base system, kernel, and firmware.
+        </p>
+        <pre>pacstrap /mnt base linux linux-firmware</pre>
+
+        <h4>Step 9, Generate fstab</h4>
+        <p>
+            Generate the filesystem table so mounts persist after reboot
+        </p>
+        <pre>genfstab -U /mnt >> /mnt/etc/fstab</pre>
+
+        <h4>Step 10, Chroot into the degenerate zone (if you are a noob refer to this as the system, /mnt directory which will soon be the / directory)</h4>
+        <p>
+            You are now entering the degenerate zone (the arch linux system chroot, scary)
+        </p>
+        <pre>arch-chroot /mnt</pre>
+
+        <h4>Step 11, Timezone and locale</h4>
+        <p>
+            Set your timezone and sync the hardware clock
+        </p>
+        <pre>
+ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+hwclock --systohc
+        </pre>
+        <p>
+            Enable the locale and generate it, It's Delta
+        </p>
+        <pre>
+nano /etc/locale.gen
+locale-gen
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+        </pre>
+
+        <h4>Step 12, Hostname</h4>
+        <p>
+            Set a hostname and update the EVIL hosts file
+        </p>
+        <pre>
+echo "archlinux" > /etc/hostname
+nano /etc/hosts
+        </pre>
+
+        <h4>Step 13, Packages you will need to even have a desktop to use, the thing I made to make this silly install guide</h4>
+        <p>
+            Installing the super delta packages and then enabling them
+        </p>
+        <pre>
+pacman -S grub efibootmgr networkmanager sudo nano
+systemctl enable NetworkManager
+        </pre>
+
+        <h4>Step 14, Users and passwords</h4>
+        <p>
+            Set the root password, then create a silly regular user
+            Daily driving as root is a bad idea !! do not do that.
+        </p>
+        <pre>
+passwd
+useradd -m -G wheel user
+passwd user
+EDITOR=nano visudo
+        </pre>
+
+        <h4>Step 15, Bootloader installation</h4>
+        <p>
+            Install and configure the innocent man grub v0.000001 (whatever the installation of your arch install guide (the iso updates every single second) for UEFI
+        </p>
+        <pre>
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+grub-mkconfig -o /boot/grub/grub.cfg
+        </pre>
+
+        <h4>Step 16, Desktop environment (optional but I like being able to click on things so I can program easier without looking at a black and gray screen)</h4>
+        <p>
+            Skip this step if you want a terminal only system btw
+        </p>
+        <p>
+            XFCE option thing
+        </p>
+        <pre>
+pacman -S xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
+systemctl enable lightdm
+        </pre>
+        <p>
+            KDE Plasma option !! slightly heavier, but very polished
+        </p>
+        <pre>
+pacman -S plasma kde-applications sddm
+systemctl enable sddm
+        </pre>
+
+        <h4>Step 17, Finish up your new degenerate distro computer</h4>
+        <p>
+            Exit the chroot, unmount everything, and reboot. this is so you don't boot up into your usb constantly and see that you cannot boot into a existing os
+            Remove the usb guy when prompted.
+        </p>
+        <pre>
+exit
+umount -R /mnt
+reboot
+        </pre>
+    </div>
+</body>
+</html>
