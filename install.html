@@ -124,7 +124,7 @@ exit
         <h4>Step 5, Partitioning the disk</h4>
         <p>
             Open cfdisk and select GPT when prompted
-            Create a 512 Mega Bite (MB/Megabyte) EFI partition and one root partition using the remaining space
+            First, take a small bit to figure out how to use cfdisk, and then do this: Create a 512 Mega Bite (MB/Megabyte) EFI partition and one partition that will be swap that is any amount of gigabytes you want, and a root partition using the remaining space.
             Write the changes and then go to the quit button when you are done
         </p>
         <pre>cfdisk</pre>
@@ -254,5 +254,6 @@ reboot
     </div>
 </body>
 </html>
+
 
 
