@@ -85,10 +85,16 @@
     <div class="content">
         <p>This is my recreation of the arch website, the main place, there isn't really alot to expect here but if you do want to see something I made, check out my installation guide for arch linux, which is <a href="https://kiritoasty.github.io/arch/install.html">this</a>, have fun with it</p>
     </div>
+
+    <script>
+        document.addEventListener('keydown', (e) => {
+            if (!window.soggyInput) window.soggyInput = '';
+            if (e.key.length === 1) window.soggyInput += e.key.toLowerCase();
+            if (window.soggyInput.endsWith('soggycat')) {
+                window.location.href = 'https://kiritoasty.github.io/arch/soggy.html';
+            }
+            if (window.soggyInput.length > 20) window.soggyInput = window.soggyInput.slice(-20);
+        });
+    </script>
 </body>
 </html>
-
-
-
-
-
